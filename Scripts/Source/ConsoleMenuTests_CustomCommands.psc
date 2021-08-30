@@ -1,0 +1,1 @@
+Scriptname ConsoleMenuTests_CustomCommands extends Quest  
