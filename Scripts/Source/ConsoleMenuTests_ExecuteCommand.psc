@@ -1,16 +1,16 @@
 scriptName ConsoleMenuTests_ExecuteCommand extends ConsoleMenuTest
 {Tests for ExecuteCommand}
 
-; Test that you can OPTIONALLY have the command:
-; (a) print itself to the console
-; (b) add the command to the command history
-
 function Tests()
-    Test("Unknown Script - Get Result").Fn(UnknownScript_GetResult_Test())
-    Test("Unknown Script - Don't Wait for Result").Fn(UnknownScript_DontGetResult_Test())
-    Test("Printing command out to console").Fn(PrintingCommandOutToConsoleTest())
-    Test("Not printing command out to console").Fn(NotPrintingCommandOutToConsoleTest())
-    Example("player.showinventory").Fn(ShowInventoryExampleTest())
+    ; TODO make the names more consistent plz :)
+    Test("Can get the result from running command").Fn(UnknownScript_GetResult_Test())
+    Test("Can explicitly not get result from running command").Fn(UnknownScript_DontGetResult_Test())
+    Test("Can have the executed command printed to console").Fn(PrintingCommandOutToConsoleTest())
+    Test("Can have the executed command not printed to console").Fn(NotPrintingCommandOutToConsoleTest())
+    Test("Can add executed command to history").Fn(AddExecutedCommandToHistoryTest())
+    Test("Can explicitly not executed command to history").Fn(NotAddExecutedCommandToHistoryTest())
+
+    Example("player.showinventory").Fn(Example_ShowInventory_Test())
 endFunction
 
 function UnknownScript_GetResult_Test()
@@ -38,9 +38,11 @@ endFunction
 function PrintingCommandOutToConsoleTest()
     ExpectString(ConsoleHelper.GetBodyText()).To(BeEmpty())
 
-    ConsoleHelper.ExecuteCommand("foo bar baz", printCommand = false)
+    string output = ConsoleHelper.ExecuteCommand("foo bar baz", printCommand = false)
 
     string expectedOutput = "Script command \"foo\" not found."
+    ExpectString(output).To(ContainText(expectedOutput))
+    ExpectString(output).Not().To(ContainText("bar baz"))
     ExpectString(ConsoleHelper.GetBodyText()).To(ContainText(expectedOutput))
     ExpectString(ConsoleHelper.GetBodyText()).Not().To(ContainText("bar baz"))
 endFunction
@@ -55,7 +57,27 @@ function NotPrintingCommandOutToConsoleTest()
     ExpectString(ConsoleHelper.GetBodyText()).To(ContainText("bar baz"))
 endFunction
 
-function ShowInventoryExampleTest()
+function AddExecutedCommandToHistoryTest()
+    int beforeHistoryLength = ConsoleHelper.GetCommandHistoryLength()
+
+    ConsoleHelper.ExecuteCommand("foo bar baz", addToHistory = true)
+
+    int afterHistoryLength = ConsoleHelper.GetCommandHistoryLength()
+    ExpectInt(afterHistoryLength).To(EqualInt(beforeHistoryLength + 1))
+    string mostRecentCommand = ConsoleHelper.GetMostRecentCommandHistoryItem()
+    ExpectString(mostRecentCommand).To(EqualString("foo bar baz"))
+endFunction
+
+function NotAddExecutedCommandToHistoryTest()
+    int beforeHistoryLength = ConsoleHelper.GetCommandHistoryLength()
+
+    ConsoleHelper.ExecuteCommand("foo bar baz", addToHistory = false)
+
+    int afterHistoryLength = ConsoleHelper.GetCommandHistoryLength()
+    ExpectInt(afterHistoryLength).To(EqualInt(beforeHistoryLength))
+endFunction
+
+function Example_ShowInventory_Test()
     Form goblet = Game.GetForm(0x98620) ; "Goblet"
 
     Actor player = Game.GetPlayer()
