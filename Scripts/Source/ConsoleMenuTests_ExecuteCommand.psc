@@ -2,18 +2,17 @@ scriptName ConsoleMenuTests_ExecuteCommand extends ConsoleMenuTest
 {Tests for ExecuteCommand}
 
 function Tests()
-    ; TODO make the names more consistent plz :)
-    Test("Can get the result from running command").Fn(UnknownScript_GetResult_Test())
-    Test("Can explicitly not get result from running command").Fn(UnknownScript_DontGetResult_Test())
-    Test("Can have the executed command printed to console").Fn(PrintingCommandOutToConsoleTest())
-    Test("Can have the executed command not printed to console").Fn(NotPrintingCommandOutToConsoleTest())
-    Test("Can add executed command to history").Fn(AddExecutedCommandToHistoryTest())
-    Test("Can explicitly not executed command to history").Fn(NotAddExecutedCommandToHistoryTest())
+    Example("Get the result from running command").Fn(GetResult_Test())
+    Example("Don't get result from running command").Fn(DontGetResult_Test())
+    Example("Print executed command to console").Fn(PrintCommandToConsole_Test())
+    Example("Don't print executed command to console").Fn(DontPrintCommandToConsole_Test())
+    Example("Add executed command to history").Fn(AddExecutedCommandToHistory_Test())
+    Example("Don't add executed command to history").Fn(DontAddExecutedCommandToHistory_Test())
 
     Example("player.showinventory").Fn(Example_ShowInventory_Test())
 endFunction
 
-function UnknownScript_GetResult_Test()
+function GetResult_Test()
     ExpectString(ConsoleHelper.GetBodyText()).To(BeEmpty())
 
     string output = ConsoleHelper.ExecuteCommand("just some gibberish")
@@ -24,7 +23,7 @@ function UnknownScript_GetResult_Test()
     ExpectString(Consolehelper.GetBodyText()).To(ContainText(expectedOutput))
 endFunction
 
-function UnknownScript_DontGetResult_Test()
+function DontGetResult_Test()
     ExpectString(ConsoleHelper.GetBodyText()).To(BeEmpty())
 
     string output = ConsoleHelper.ExecuteCommand("just some gibberish", getResult = false)
@@ -35,7 +34,7 @@ function UnknownScript_DontGetResult_Test()
     ExpectString(Consolehelper.GetBodyText()).To(ContainText(expectedOutput))
 endFunction
 
-function PrintingCommandOutToConsoleTest()
+function PrintCommandToConsole_Test()
     ExpectString(ConsoleHelper.GetBodyText()).To(BeEmpty())
 
     string output = ConsoleHelper.ExecuteCommand("foo bar baz", printCommand = false)
@@ -47,7 +46,7 @@ function PrintingCommandOutToConsoleTest()
     ExpectString(ConsoleHelper.GetBodyText()).Not().To(ContainText("bar baz"))
 endFunction
 
-function NotPrintingCommandOutToConsoleTest()
+function DontPrintCommandToConsole_Test()
     ExpectString(ConsoleHelper.GetBodyText()).To(BeEmpty())
 
     ConsoleHelper.ExecuteCommand("foo bar baz", printCommand = true)
@@ -57,7 +56,7 @@ function NotPrintingCommandOutToConsoleTest()
     ExpectString(ConsoleHelper.GetBodyText()).To(ContainText("bar baz"))
 endFunction
 
-function AddExecutedCommandToHistoryTest()
+function AddExecutedCommandToHistory_Test()
     int beforeHistoryLength = ConsoleHelper.GetCommandHistoryLength()
 
     ConsoleHelper.ExecuteCommand("foo bar baz", addToHistory = true)
@@ -68,7 +67,7 @@ function AddExecutedCommandToHistoryTest()
     ExpectString(mostRecentCommand).To(EqualString("foo bar baz"))
 endFunction
 
-function NotAddExecutedCommandToHistoryTest()
+function DontAddExecutedCommandToHistory_Test()
     int beforeHistoryLength = ConsoleHelper.GetCommandHistoryLength()
 
     ConsoleHelper.ExecuteCommand("foo bar baz", addToHistory = false)
